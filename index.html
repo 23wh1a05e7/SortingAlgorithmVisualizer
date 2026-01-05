@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Sorting Visualizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --bg-dark: #1a1a2e;
+            --bg-medium: #16213e;
+            --text-light: #f1f1f1;
+            --text-muted: #b0b0d0;
+            --success: #2ed573;
+            --warning: #ff9a00;
+            --danger: #ff4757;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        /* Dark Theme (Default) */
+        .theme-dark {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0f172a;
+            --card-bg: rgba(0, 0, 0, 0.3);
+            --text-primary: #f1f1f1;
+            --text-secondary: #b0b0d0;
+            --border-color: rgba(106, 147, 255, 0.2);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Light Theme */
+        .theme-light {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #e9ecef;
+            --bg-tertiary: #dee2e6;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Cyberpunk Theme */
+        .theme-cyberpunk {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #121225;
+            --bg-tertiary: #1a1a35;
+            --card-bg: rgba(20, 20, 40, 0.7);
+            --text-primary: #00ffea;
+            --text-secondary: #a0a0ff;
+            --border-color: rgba(0, 255, 234, 0.3);
+            --shadow-color: rgba(0, 255, 234, 0.1);
+            --primary: #ff00ff;
+            --secondary: #00ffea;
+        }
+
+        /* Nature Theme */
+        .theme-nature {
+            --bg-primary: #1a3c2e;
+            --bg-secondary: #2d5a45;
+            --bg-tertiary: #1e4d2f;
+            --card-bg: rgba(30, 77, 47, 0.7);
+            --text-primary: #e8f5e9;
+            --text-secondary: #c8e6c9;
+            --border-color: rgba(76, 175, 80, 0.3);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --primary: #4caf50;
+            --secondary: #8bc34a;
+        }
+
+        /* Gradient Theme */
+        .theme-gradient {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-secondary: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            --bg-tertiary: rgba(102, 126, 234, 0.9);
+            --card-bg: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --primary: #ffffff;
+            --secondary: #764ba2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px var(--shadow-color);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .header-left .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Theme Selector */
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-btn.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Visualization Panel */
+        .visualization-panel {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Array Container */
+        .array-container {
+            height: 400px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Bar Styles */
+        .array-bar {
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 4px 4px 0 0;
+            flex: 1;
+            min-width: 8px;
+            transition: height 0.3s ease, background 0.3s ease;
+        }
+
+        .array-bar.comparing {
+            background: var(--warning);
+        }
+
+        .array-bar.swapping {
+            background: var(--danger);
+        }
+
+        .array-bar.sorted {
+            background: var(--success);
+        }
+
+        .array-bar.pivot {
+            background: #9b59b6;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .control-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Algorithm Selection */
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .algorithm-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        .algorithm-card.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+        }
+
+        .algorithm-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .algorithm-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .algorithm-complexity {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Slider Controls */
+        .slider-group {
+            margin-bottom: 20px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .slider-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .slider-value {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid var(--secondary);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 16px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .action-btn.primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn.secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn.secondary:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Info Panel */
+        .info-panel {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px var(--shadow-color);
+            margin-top: 20px;
+        }
+
+        .algorithm-description {
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .algorithm-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .detail-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Settings Panel */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .setting-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .setting-label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--text-secondary);
+            border-radius: 34px;
+            transition: .4s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .algorithm-grid,
+            .stats-grid,
+            .algorithm-details,
+            .settings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-left h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .algorithm-grid,
+            .stats-grid,
+            .algorithm-details,
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="theme-dark">
+    <div class="container">
+        <!-- Header with Theme Selector -->
+        <header>
+            <div class="header-left">
+                <h1><i class="fas fa-sort-amount-down-alt"></i> Advanced Sorting Visualizer</h1>
+                <p class="subtitle">Interactive visualization</p>
+            </div>
+            
+            <div class="theme-selector">
+                <button class="theme-btn active" data-theme="dark" title="Dark Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="theme-btn" data-theme="light" title="Light Theme">
+                    <i class="fas fa-sun"></i>
+                </button>
+                <button class="theme-btn" data-theme="cyberpunk" title="Cyberpunk Theme">
+                    <i class="fas fa-gamepad"></i>
+                </button>
+                <button class="theme-btn" data-theme="nature" title="Nature Theme">
+                    <i class="fas fa-leaf"></i>
+                </button>
+                <button class="theme-btn" data-theme="gradient" title="Gradient Theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Visualization Panel -->
+            <div class="visualization-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <i class="fas fa-chart-bar"></i> Sorting Visualization
+                    </h2>
+                </div>
+                
+                <div class="array-container" id="array-container">
+                    <!-- Array bars will be generated here -->
+                </div>
+            </div>
+            
+            <!-- Controls Panel -->
+            <div class="controls-panel">
+                <!-- Algorithm Selection -->
+                <div class="control-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-sort"></i> Sorting Algorithms
+                    </h3>
+                    
+                    <div class="algorithm-grid">
+                        <div class="algorithm-card active" data-algorithm="bubble">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-sort-amount-up"></i>
+                            </div>
+                            <div class="algorithm-name">Bubble Sort</div>
+                            <div class="algorithm-complexity">O(n²)</div>
+                        </div>
+                        
+                        <div class="algorithm-card" data-algorithm="selection">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-mouse-pointer"></i>
+                            </div>
+                            <div class="algorithm-name">Selection Sort</div>
+                            <div class="algorithm-complexity">O(n²)</div>
+                        </div>
+                        
+                        <div class="algorithm-card" data-algorithm="insertion">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-arrow-right-to-bracket"></i>
+                            </div>
+                            <div class="algorithm-name">Insertion Sort</div>
+                            <div class="algorithm-complexity">O(n²)</div>
+                        </div>
+                        
+                        <div class="algorithm-card" data-algorithm="merge">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-code-branch"></i>
+                            </div>
+                            <div class="algorithm-name">Merge Sort</div>
+                            <div class="algorithm-complexity">O(n log n)</div>
+                        </div>
+                        
+                        <div class="algorithm-card" data-algorithm="quick">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="algorithm-name">Quick Sort</div>
+                            <div class="algorithm-complexity">O(n log n)</div>
+                        </div>
+                        
+                        <div class="algorithm-card" data-algorithm="heap">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-tree"></i>
+                            </div>
+                            <div class="algorithm-name">Heap Sort</div>
+                            <div class="algorithm-complexity">O(n log n)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Array Size</span>
+                            <span class="slider-value" id="size-value">40</span>
+                        </div>
+                        <input type="range" class="slider" id="array-size" min="10" max="100" value="40">
+                    </div>
+                    
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Sorting Speed</span>
+                            <span class="slider-value" id="speed-value">Medium</span>
+                        </div>
+                        <input type="range" class="slider" id="sort-speed" min="1" max="100" value="50">
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="control-section">
+                    <div class="action-buttons">
+                        <button class="action-btn primary" id="generate-btn">
+                            <i class="fas fa-random"></i> New Array
+                        </button>
+                        <button class="action-btn primary" id="sort-btn">
+                            <i class="fas fa-play"></i> Start Sort
+                        </button>
+                        <button class="action-btn secondary" id="pause-btn">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="action-btn secondary" id="reset-btn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="control-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line"></i> Statistics
+                    </h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="comparisons">0</div>
+                            <div class="stat-label">Comparisons</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="swaps">0</div>
+                            <div class="stat-label">Swaps</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="time">0ms</div>
+                            <div class="stat-label">Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Information Panel -->
+        <div class="info-panel">
+            <h3 class="section-title">
+                <i class="fas fa-info-circle"></i> Algorithm Information
+            </h3>
+            
+            <p class="algorithm-description" id="algorithm-description">
+                Bubble Sort repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order. The pass through the list is repeated until the list is sorted.
+            </p>
+            
+            <div class="algorithm-details">
+                <div class="detail-card">
+                    <div class="detail-value" id="time-complexity">O(n²)</div>
+                    <div class="detail-label">Time Complexity</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" id="space-complexity">O(1)</div>
+                    <div class="detail-label">Space Complexity</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" id="algorithm-stability">Stable</div>
+                    <div class="detail-label">Stability</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Panel -->
+        <div class="info-panel">
+            <h3 class="section-title">
+                <i class="fas fa-cog"></i> Visualization Settings
+            </h3>
+            
+            <div class="settings-grid">
+                <div class="setting-option">
+                    <span class="setting-label">Show Values</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="show-values" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Show Animations</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="show-animations" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Sound Effects</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="sound-effects">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Dark Mode</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="dark-mode" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Advanced Sorting Algorithm Visualizer &copy; 2023 | Multiple UI/UX Themes Available</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const arrayContainer = document.getElementById('array-container');
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        const algorithmCards = document.querySelectorAll('.algorithm-card');
+        const generateBtn = document.getElementById('generate-btn');
+        const sortBtn = document.getElementById('sort-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const arraySizeSlider = document.getElementById('array-size');
+        const sortSpeedSlider = document.getElementById('sort-speed');
+        const sizeValue = document.getElementById('size-value');
+        const speedValue = document.getElementById('speed-value');
+        const comparisonsElement = document.getElementById('comparisons');
+        const swapsElement = document.getElementById('swaps');
+        const timeElement = document.getElementById('time');
+        const algorithmDescription = document.getElementById('algorithm-description');
+        const timeComplexityElement = document.getElementById('time-complexity');
+        const spaceComplexityElement = document.getElementById('space-complexity');
+        const stabilityElement = document.getElementById('algorithm-stability');
+        
+        // Settings checkboxes
+        const showValuesCheckbox = document.getElementById('show-values');
+        const showAnimationsCheckbox = document.getElementById('show-animations');
+        const soundEffectsCheckbox = document.getElementById('sound-effects');
+        const darkModeCheckbox = document.getElementById('dark-mode');
+        
+        // Global variables
+        let array = [];
+        let arraySize = parseInt(arraySizeSlider.value);
+        let sortSpeed = 101 - parseInt(sortSpeedSlider.value);
+        let selectedAlgorithm = 'bubble';
+        let isSorting = false;
+        let isPaused = false;
+        let currentTheme = 'dark';
+        let stats = {
+            comparisons: 0,
+            swaps: 0,
+            startTime: 0
+        };
+        
+        // Algorithm information database
+        const algorithmInfo = {
+            bubble: {
+                description: "Bubble Sort repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order. The pass through the list is repeated until the list is sorted.",
+                timeComplexity: "O(n²)",
+                spaceComplexity: "O(1)",
+                stability: "Stable",
+                bestCase: "O(n)",
+                worstCase: "O(n²)"
+            },
+            selection: {
+                description: "Selection Sort divides the input list into two parts: a sorted sublist and an unsorted sublist. It repeatedly finds the minimum element from the unsorted sublist and moves it to the end of the sorted sublist.",
+                timeComplexity: "O(n²)",
+                spaceComplexity: "O(1)",
+                stability: "Not Stable",
+                bestCase: "O(n²)",
+                worstCase: "O(n²)"
+            },
+            insertion: {
+                description: "Insertion Sort builds the final sorted array one item at a time. It takes each element from the unsorted part and inserts it into its correct position in the sorted part.",
+                timeComplexity: "O(n²)",
+                spaceComplexity: "O(1)",
+                stability: "Stable",
+                bestCase: "O(n)",
+                worstCase: "O(n²)"
+            },
+            merge: {
+                description: "Merge Sort is a divide-and-conquer algorithm that divides the input array into two halves, recursively sorts them, and then merges the two sorted halves.",
+                timeComplexity: "O(n log n)",
+                spaceComplexity: "O(n)",
+                stability: "Stable",
+                bestCase: "O(n log n)",
+                worstCase: "O(n log n)"
+            },
+            quick: {
+                description: "Quick Sort is a divide-and-conquer algorithm that picks an element as a pivot and partitions the array around the pivot. It then recursively sorts the sub-arrays.",
+                timeComplexity: "O(n log n)",
+                spaceComplexity: "O(log n)",
+                stability: "Not Stable",
+                bestCase: "O(n log n)",
+                worstCase: "O(n²)"
+            },
+            heap: {
+                description: "Heap Sort is a comparison-based sorting algorithm that uses a binary heap data structure. It divides its input into a sorted and an unsorted region, and iteratively shrinks the unsorted region by extracting the largest element and moving it to the sorted region.",
+                timeComplexity: "O(n log n)",
+                spaceComplexity: "O(1)",
+                stability: "Not Stable",
+                bestCase: "O(n log n)",
+                worstCase: "O(n log n)"
+            }
+        };
+        
+        // Initialize the application
+        function init() {
+            updateAlgorithmInfo();
+            generateNewArray();
+            setupEventListeners();
+        }
+        
+        // Generate a new random array
+        function generateNewArray() {
+            if (isSorting) return;
+            
+            array = [];
+            const containerWidth = arrayContainer.clientWidth;
+            const barWidth = Math.max(5, Math.floor(containerWidth / arraySize) - 2);
+            
+            for (let i = 0; i < arraySize; i++) {
+                array.push(Math.floor(Math.random() * 95) + 5);
+            }
+            
+            renderArray();
+            resetStats();
+        }
+        
+        // Render the array
+        function renderArray(highlightIndices = [], highlightType = '') {
+            arrayContainer.innerHTML = '';
+            
+            for (let i = 0; i < array.length; i++) {
+                const bar = document.createElement('div');
+                bar.classList.add('array-bar');
+                bar.style.height = `${array[i]}%`;
+                
+                // Add value label if setting is enabled
+                if (showValuesCheckbox.checked && arraySize <= 40) {
+                    bar.textContent = array[i];
+                    bar.style.fontSize = '12px';
+                    bar.style.display = 'flex';
+                    bar.style.alignItems = 'center';
+                    bar.style.justifyContent = 'center';
+                    bar.style.color = 'white';
+                    bar.style.fontWeight = 'bold';
+                }
+                
+                // Highlight bars
+                if (highlightIndices.includes(i)) {
+                    bar.classList.add(highlightType);
+                }
+                
+                arrayContainer.appendChild(bar);
+            }
+        }
+        
+        // Reset statistics
+        function resetStats() {
+            stats.comparisons = 0;
+            stats.swaps = 0;
+            stats.startTime = 0;
+            updateStatsDisplay();
+        }
+        
+        // Update statistics display
+        function updateStatsDisplay() {
+            comparisonsElement.textContent = stats.comparisons;
+            swapsElement.textContent = stats.swaps;
+            
+            if (stats.startTime > 0) {
+                const elapsedTime = Date.now() - stats.startTime;
+                timeElement.textContent = `${elapsedTime}ms`;
+            } else {
+                timeElement.textContent = '0ms';
+            }
+        }
+        
+        // Update algorithm information display
+        function updateAlgorithmInfo() {
+            const info = algorithmInfo[selectedAlgorithm];
+            algorithmDescription.textContent = info.description;
+            timeComplexityElement.textContent = info.timeComplexity;
+            spaceComplexityElement.textContent = info.spaceComplexity;
+            stabilityElement.textContent = info.stability;
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Theme selection
+            themeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    themeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTheme = btn.dataset.theme;
+                    
+                    // Apply theme
+                    document.body.className = `theme-${currentTheme}`;
+                    
+                    // Update dark mode checkbox
+                    darkModeCheckbox.checked = currentTheme === 'dark';
+                });
+            });
+            
+            // Algorithm selection
+            algorithmCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    if (isSorting) return;
+                    
+                    algorithmCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    selectedAlgorithm = card.dataset.algorithm;
+                    updateAlgorithmInfo();
+                });
+            });
+            
+            // Array size slider
+            arraySizeSlider.addEventListener('input', () => {
+                arraySize = parseInt(arraySizeSlider.value);
+                sizeValue.textContent = arraySize;
+                if (!isSorting) generateNewArray();
+            });
+            
+            // Sort speed slider
+            sortSpeedSlider.addEventListener('input', () => {
+                const speedValueInt = parseInt(sortSpeedSlider.value);
+                sortSpeed = 101 - speedValueInt;
+                
+                if (speedValueInt < 33) {
+                    speedValue.textContent = 'Slow';
+                } else if (speedValueInt < 66) {
+                    speedValue.textContent = 'Medium';
+                } else {
+                    speedValue.textContent = 'Fast';
+                }
+            });
+            
+            // Generate new array button
+            generateBtn.addEventListener('click', generateNewArray);
+            
+            // Sort button
+            sortBtn.addEventListener('click', () => {
+                if (isSorting) return;
+                startSorting();
+            });
+            
+            // Pause button
+            pauseBtn.addEventListener('click', () => {
+                if (!isSorting) return;
+                
+                isPaused = !isPaused;
+                pauseBtn.innerHTML = isPaused ? 
+                    '<i class="fas fa-play"></i> Resume' : 
+                    '<i class="fas fa-pause"></i> Pause';
+                
+                if (isPaused) {
+                    sortBtn.disabled = true;
+                } else {
+                    sortBtn.disabled = false;
+                }
+            });
+            
+            // Reset button
+            resetBtn.addEventListener('click', () => {
+                if (isSorting) {
+                    isSorting = false;
+                    isPaused = false;
+                    sortBtn.disabled = false;
+                    generateBtn.disabled = false;
+                    arraySizeSlider.disabled = false;
+                    pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                }
+                generateNewArray();
+            });
+            
+            // Settings checkboxes
+            showValuesCheckbox.addEventListener('change', () => {
+                renderArray();
+            });
+            
+            darkModeCheckbox.addEventListener('change', () => {
+                if (darkModeCheckbox.checked) {
+                    applyTheme('dark');
+                } else {
+                    applyTheme('light');
+                }
+            });
+        }
+        
+        // Apply theme
+        function applyTheme(themeName) {
+            themeButtons.forEach(b => b.classList.remove('active'));
+                        const themeBtn = document.querySelector(`[data-theme="${themeName}"]`);
+            if (themeBtn) themeBtn.classList.add('active');
+            currentTheme = themeName;
+            document.body.className = `theme-${currentTheme}`;
+        }
+        
+        // Start the sorting process
+        async function startSorting() {
+            if (isSorting) return;
+            
+            isSorting = true;
+            isPaused = false;
+            sortBtn.disabled = true;
+            generateBtn.disabled = true;
+            arraySizeSlider.disabled = true;
+            pauseBtn.disabled = false;
+            
+            // Reset stats and start timer
+            resetStats();
+            stats.startTime = Date.now();
+            
+            // Call the selected sorting algorithm
+            switch (selectedAlgorithm) {
+                case 'bubble':
+                    await bubbleSort();
+                    break;
+                case 'selection':
+                    await selectionSort();
+                    break;
+                case 'insertion':
+                    await insertionSort();
+                    break;
+                case 'merge':
+                    await mergeSort();
+                    break;
+                case 'quick':
+                    await quickSort();
+                    break;
+                case 'heap':
+                    await heapSort();
+                    break;
+            }
+            
+            // Mark all bars as sorted at the end
+            if (isSorting) {
+                document.querySelectorAll('.array-bar').forEach(bar => {
+                    bar.classList.add('sorted');
+                });
+                finishSorting();
+            }
+        }
+        
+        // Helper function to swap array elements
+        function swap(i, j) {
+            const temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+            stats.swaps++;
+            updateStatsDisplay();
+        }
+        
+        // Helper function to compare elements
+        function compare() {
+            stats.comparisons++;
+            updateStatsDisplay();
+        }
+        
+        // Sleep function for visualization delay
+        function sleep(ms) {
+            return new Promise(resolve => {
+                if (!showAnimationsCheckbox.checked) {
+                    resolve();
+                    return;
+                }
+                
+                const interval = setInterval(() => {
+                    if (!isPaused) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, ms);
+            });
+        }
+        
+        // Wait for resume if paused
+        function waitForResume() {
+            return new Promise(resolve => {
+                const checkPause = setInterval(() => {
+                    if (!isPaused) {
+                        clearInterval(checkPause);
+                        resolve();
+                    }
+                }, 100);
+            });
+        }
+        
+        // Bubble Sort implementation
+        async function bubbleSort() {
+            let n = array.length;
+            let swapped;
+            
+            for (let i = 0; i < n - 1; i++) {
+                swapped = false;
+                
+                for (let j = 0; j < n - i - 1; j++) {
+                    if (!isSorting) return;
+                    if (isPaused) await waitForResume();
+                    
+                    // Visualize comparison
+                    renderArray([j, j + 1], 'comparing');
+                    compare();
+                    
+                    await sleep(sortSpeed * 2);
+                    
+                    if (array[j] > array[j + 1]) {
+                        // Visualize swap
+                        renderArray([j, j + 1], 'swapping');
+                        await sleep(sortSpeed * 2);
+                        
+                        swap(j, j + 1);
+                        
+                        // Visualize after swap
+                        renderArray([j, j + 1], 'comparing');
+                        await sleep(sortSpeed);
+                        
+                        swapped = true;
+                    }
+                }
+                
+                // Mark sorted element
+                const sortedIndex = n - i - 1;
+                const bars = document.querySelectorAll('.array-bar');
+                if (bars[sortedIndex]) bars[sortedIndex].classList.add('sorted');
+                
+                if (!swapped) break;
+            }
+            
+            // Mark all bars as sorted
+            if (isSorting) {
+                const bars = document.querySelectorAll('.array-bar');
+                bars.forEach(bar => bar.classList.add('sorted'));
+            }
+        }
+        
+        // Selection Sort implementation
+        async function selectionSort() {
+            let n = array.length;
+            
+            for (let i = 0; i < n - 1; i++) {
+                let minIdx = i;
+                
+                for (let j = i + 1; j < n; j++) {
+                    if (!isSorting) return;
+                    if (isPaused) await waitForResume();
+                    
+                    // Visualize comparison
+                    renderArray([minIdx, j], 'comparing');
+                    compare();
+                    await sleep(sortSpeed * 2);
+                    
+                    if (array[j] < array[minIdx]) {
+                        minIdx = j;
+                    }
+                }
+                
+                if (minIdx !== i) {
+                    // Visualize swap
+                    renderArray([i, minIdx], 'swapping');
+                    await sleep(sortSpeed * 2);
+                    
+                    swap(i, minIdx);
+                    
+                    // Visualize after swap
+                    renderArray([i, minIdx], 'comparing');
+                    await sleep(sortSpeed);
+                }
+                
+                // Mark sorted element
+                const bars = document.querySelectorAll('.array-bar');
+                if (bars[i]) bars[i].classList.add('sorted');
+            }
+            
+            // Mark last element as sorted
+            const bars = document.querySelectorAll('.array-bar');
+            if (bars[array.length - 1]) bars[array.length - 1].classList.add('sorted');
+        }
+        
+        // Insertion Sort implementation
+        async function insertionSort() {
+            let n = array.length;
+            
+            // Mark first element as sorted
+            const bars = document.querySelectorAll('.array-bar');
+            if (bars[0]) bars[0].classList.add('sorted');
+            
+            for (let i = 1; i < n; i++) {
+                let key = array[i];
+                let j = i - 1;
+                
+                if (!isSorting) return;
+                if (isPaused) await waitForResume();
+                
+                // Visualize current element being inserted
+                renderArray([i], 'comparing');
+                await sleep(sortSpeed * 2);
+                
+                while (j >= 0 && array[j] > key) {
+                    if (!isSorting) return;
+                    if (isPaused) await waitForResume();
+                    
+                    compare();
+                    
+                    // Visualize shift
+                    renderArray([j, j + 1], 'swapping');
+                    await sleep(sortSpeed * 2);
+                    
+                    array[j + 1] = array[j];
+                    stats.swaps++;
+                    updateStatsDisplay();
+                    
+                    // Visualize after shift
+                    renderArray([j, j + 1], 'comparing');
+                    await sleep(sortSpeed);
+                    
+                    j--;
+                }
+                
+                array[j + 1] = key;
+                stats.swaps++;
+                updateStatsDisplay();
+                
+                // Mark sorted elements
+                for (let k = 0; k <= i; k++) {
+                    if (bars[k]) bars[k].classList.add('sorted');
+                }
+                
+                renderArray();
+                await sleep(sortSpeed);
+            }
+        }
+        
+        // Merge Sort implementation
+        async function mergeSort() {
+            await mergeSortHelper(0, array.length - 1);
+        }
+        
+        async function mergeSortHelper(l, r) {
+            if (l >= r || !isSorting) return;
+            if (isPaused) await waitForResume();
+            
+            const m = Math.floor(l + (r - l) / 2);
+            
+            await mergeSortHelper(l, m);
+            await mergeSortHelper(m + 1, r);
+            await merge(l, m, r);
+        }
+        
+        async function merge(l, m, r) {
+            const n1 = m - l + 1;
+            const n2 = r - m;
+            
+            let left = new Array(n1);
+            let right = new Array(n2);
+            
+            for (let i = 0; i < n1; i++) {
+                left[i] = array[l + i];
+            }
+            for (let j = 0; j < n2; j++) {
+                right[j] = array[m + 1 + j];
+            }
+            
+            let i = 0, j = 0, k = l;
+            
+            while (i < n1 && j < n2 && isSorting) {
+                if (isPaused) await waitForResume();
+                
+                compare();
+                
+                // Visualize comparison
+                renderArray([l + i, m + 1 + j], 'comparing');
+                await sleep(sortSpeed);
+                
+                if (left[i] <= right[j]) {
+                    array[k] = left[i];
+                    i++;
+                } else {
+                    array[k] = right[j];
+                    j++;
+                }
+                
+                // Visualize placement
+                renderArray([k], 'swapping');
+                await sleep(sortSpeed);
+                
+                stats.swaps++;
+                updateStatsDisplay();
+                k++;
+            }
+            
+            while (i < n1 && isSorting) {
+                if (isPaused) await waitForResume();
+                
+                array[k] = left[i];
+                
+                // Visualize placement
+                renderArray([k], 'swapping');
+                await sleep(sortSpeed);
+                
+                stats.swaps++;
+                updateStatsDisplay();
+                i++;
+                k++;
+            }
+            
+            while (j < n2 && isSorting) {
+                if (isPaused) await waitForResume();
+                
+                array[k] = right[j];
+                
+                // Visualize placement
+                renderArray([k], 'swapping');
+                await sleep(sortSpeed);
+                
+                stats.swaps++;
+                updateStatsDisplay();
+                j++;
+                k++;
+            }
+            
+            // Mark sorted section
+            const bars = document.querySelectorAll('.array-bar');
+            for (let idx = l; idx <= r; idx++) {
+                if (bars[idx]) bars[idx].classList.add('sorted');
+            }
+        }
+        
+        // Quick Sort implementation
+        async function quickSort() {
+            await quickSortHelper(0, array.length - 1);
+        }
+        
+        async function quickSortHelper(low, high) {
+            if (low < high && isSorting) {
+                if (isPaused) await waitForResume();
+                
+                const pi = await partition(low, high);
+                
+                await quickSortHelper(low, pi - 1);
+                await quickSortHelper(pi + 1, high);
+            }
+            
+            if (low >= 0 && high >= 0 && low < array.length && high < array.length && isSorting) {
+                // Mark sorted section
+                const bars = document.querySelectorAll('.array-bar');
+                for (let i = low; i <= high; i++) {
+                    if (bars[i]) bars[i].classList.add('sorted');
+                }
+            }
+        }
+        
+        async function partition(low, high) {
+            const pivot = array[high];
+            let i = low - 1;
+            
+            // Visualize pivot
+            renderArray([high], 'pivot');
+            await sleep(sortSpeed * 2);
+            
+            for (let j = low; j <= high - 1; j++) {
+                if (!isSorting) return i + 1;
+                if (isPaused) await waitForResume();
+                
+                compare();
+                
+                // Visualize comparison with pivot
+                renderArray([j, high], 'comparing');
+                await sleep(sortSpeed);
+                
+                if (array[j] < pivot) {
+                    i++;
+                    
+                    // Visualize swap
+                    renderArray([i, j], 'swapping');
+                    await sleep(sortSpeed * 2);
+                    
+                    swap(i, j);
+                    
+                    // Visualize after swap
+                    renderArray([i, j], 'comparing');
+                    await sleep(sortSpeed);
+                }
+            }
+            
+            // Place pivot in correct position
+            renderArray([i + 1, high], 'swapping');
+            await sleep(sortSpeed * 2);
+            
+            swap(i + 1, high);
+            
+            // Visualize after pivot placement
+            renderArray([i + 1, high], 'comparing');
+            await sleep(sortSpeed);
+            
+            return i + 1;
+        }
+        
+        // Heap Sort implementation
+        async function heapSort() {
+            let n = array.length;
+            
+            // Build heap (rearrange array)
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                if (!isSorting) return;
+                if (isPaused) await waitForResume();
+                await heapify(n, i);
+            }
+            
+            // One by one extract an element from heap
+            for (let i = n - 1; i > 0; i--) {
+                if (!isSorting) return;
+                if (isPaused) await waitForResume();
+                
+                // Move current root to end
+                renderArray([0, i], 'swapping');
+                await sleep(sortSpeed * 2);
+                
+                swap(0, i);
+                
+                // Visualize after swap
+                renderArray([0, i], 'comparing');
+                await sleep(sortSpeed);
+                
+                // Mark sorted element
+                const bars = document.querySelectorAll('.array-bar');
+                if (bars[i]) bars[i].classList.add('sorted');
+                
+                // Call max heapify on the reduced heap
+                await heapify(i, 0);
+            }
+            
+            // Mark first element as sorted
+            const bars = document.querySelectorAll('.array-bar');
+            if (bars[0]) bars[0].classList.add('sorted');
+        }
+        
+        async function heapify(n, i) {
+            let largest = i;
+            let left = 2 * i + 1;
+            let right = 2 * i + 2;
+            
+            // If left child is larger than root
+            if (left < n) {
+                if (!isSorting) return;
+                if (isPaused) await waitForResume();
+                
+                compare();
+                renderArray([largest, left], 'comparing');
+                await sleep(sortSpeed);
+                
+                if (array[left] > array[largest]) {
+                    largest = left;
+                }
+            }
+            
+            // If right child is larger than largest so far
+            if (right < n) {
+                if (!isSorting) return;
+                if (isPaused) await waitForResume();
+                
+                compare();
+                renderArray([largest, right], 'comparing');
+                await sleep(sortSpeed);
+                
+                if (array[right] > array[largest]) {
+                    largest = right;
+                }
+            }
+            
+            // If largest is not root
+            if (largest !== i) {
+                renderArray([i, largest], 'swapping');
+                await sleep(sortSpeed * 2);
+                
+                swap(i, largest);
+                
+                // Visualize after swap
+                renderArray([i, largest], 'comparing');
+                await sleep(sortSpeed);
+                
+                // Recursively heapify the affected sub-tree
+                await heapify(n, largest);
+            }
+        }
+        
+        // Finish sorting process
+        function finishSorting() {
+            isSorting = false;
+            isPaused = false;
+            sortBtn.disabled = false;
+            generateBtn.disabled = false;
+            arraySizeSlider.disabled = false;
+            pauseBtn.disabled = true;
+            pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            
+            // Final render with all bars sorted
+            renderArray();
+            document.querySelectorAll('.array-bar').forEach(bar => {
+                bar.classList.add('sorted');
+            });
+        }
+        
+        // Initialize the visualizer
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
